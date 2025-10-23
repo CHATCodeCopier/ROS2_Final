@@ -1,0 +1,7 @@
+{
+  "package_name": "ackermann_msgs",
+  "non_idl_tuples": [
+    "/home/ros2/ros2_ws/src/ackermann_msgs:msg/AckermannDrive.msg",
+    "/home/ros2/ros2_ws/src/ackermann_msgs:msg/AckermannDriveStamped.msg"
+  ]
+}

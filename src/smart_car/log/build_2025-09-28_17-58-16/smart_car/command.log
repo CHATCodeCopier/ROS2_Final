@@ -1,0 +1,4 @@
+Invoking command in '/home/ros2/ros2_ws/src/smart_car/build/smart_car': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/ros2/ros2_ws/src/smart_car/build/smart_car -- -j8 -l8
+Invoked command in '/home/ros2/ros2_ws/src/smart_car/build/smart_car' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/ros2/ros2_ws/src/smart_car/build/smart_car -- -j8 -l8
+Invoking command in '/home/ros2/ros2_ws/src/smart_car/build/smart_car': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/ros2/ros2_ws/src/smart_car/build/smart_car
+Invoked command in '/home/ros2/ros2_ws/src/smart_car/build/smart_car' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/ros2/ros2_ws/src/smart_car/build/smart_car

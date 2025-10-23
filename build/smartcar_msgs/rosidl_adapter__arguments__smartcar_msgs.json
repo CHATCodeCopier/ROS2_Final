@@ -1,0 +1,6 @@
+{
+  "package_name": "smartcar_msgs",
+  "non_idl_tuples": [
+    "/home/ros2/ros2_ws/src/smartcar_msgs:msg/Status.msg"
+  ]
+}
