@@ -1,0 +1,10 @@
+# colcon / ROS2
+build/
+install/
+log/
+.colcon*
+**/__pycache__/
+*.pyc
+*.pyo
+*.swp
+*.swo
