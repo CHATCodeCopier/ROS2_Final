@@ -86,6 +86,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: false
         base_link:
           Alpha: 1
           Show Axes: false
@@ -137,13 +138,13 @@ Visualization Manager:
       Enabled: true
       Frame Timeout: 15
       Frames:
-        All Enabled: true
+        All Enabled: false
         back_left_wheel_link:
           Value: true
         back_right_wheel_link:
           Value: true
         base_footprint:
-          Value: true
+          Value: false
         base_link:
           Value: true
         chassis_link:
@@ -292,3 +293,4 @@ Window Geometry:
   Width: 1850
   X: 70
   Y: 27
+

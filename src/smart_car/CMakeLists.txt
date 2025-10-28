@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.8)
 project(smart_car)
 
+# Silence dev warnings from dependencies
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE BOOL "" FORCE)
+
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
@@ -32,7 +35,7 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
-# Install the Gazebo world for §2.2.2
+# Install the Gazebo world 
 install(
   DIRECTORY world
   DESTINATION share/${PROJECT_NAME}

@@ -5,7 +5,6 @@ from launch.actions import (
     LogInfo,
     SetEnvironmentVariable,
     TimerAction,
-    GroupAction,
 )
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
@@ -20,35 +19,36 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    # --- Packages / paths (keep your names & layout) ---
     pkg_share = FindPackageShare('smart_car')
     gazebo_ros_share = FindPackageShare('gazebo_ros')
 
-    xacro_file   = PathJoinSubstitution([pkg_share, 'urdf', 'smartcar.urdf.xacro'])
-    world_file   = PathJoinSubstitution([pkg_share, 'world', 'smalltown.world'])
-    params_file  = PathJoinSubstitution([pkg_share, 'config', 'nav2_params.yaml'])
-    map_yaml     = PathJoinSubstitution([pkg_share, 'nav2_map', 'smalltown_world.yaml'])
-    rviz_config  = PathJoinSubstitution([pkg_share, 'Rviz', 'smartcar.rviz'])
+    xacro_file  = PathJoinSubstitution([pkg_share, 'urdf', 'smartcar.urdf.xacro'])
+    world_file  = PathJoinSubstitution([pkg_share, 'world', 'smalltown.world'])
+    params_file = PathJoinSubstitution([pkg_share, 'config', 'nav2_params.yaml'])
+    map_yaml    = PathJoinSubstitution([pkg_share, 'nav2_map', 'smalltown_world.yaml'])
+    rviz_config = PathJoinSubstitution([pkg_share, 'Rviz', 'smartcar.rviz'])
 
-    # Resolve URDF from xacro
+    # Use Nav2 BT without clear-costmap recoveries
+    bt_tree = PathJoinSubstitution([
+        FindPackageShare('nav2_bt_navigator'),
+        'behavior_trees', 'navigate_w_replanning.xml'
+    ])
+
     robot_description = ParameterValue(
         Command([FindExecutable(name='xacro'), ' ', xacro_file]),
         value_type=str
     )
 
-    # --- Launch args (optional) ---
     use_sim_time = LaunchConfiguration('use_sim_time')
     declare_use_sim_time = DeclareLaunchArgument('use_sim_time', default_value='true')
 
-    # --- Make Gazebo GUI survive in VirtualBox (software rendering) ---
+    # Comment these if your VM has good 3D acceleration
     env_sw_render = [
         SetEnvironmentVariable('LIBGL_ALWAYS_SOFTWARE', '1'),
         SetEnvironmentVariable('QT_XCB_GL_INTEGRATION', 'none'),
-        # Helps some Mesa stacks in VMs:
         SetEnvironmentVariable('MESA_GL_VERSION_OVERRIDE', '3.3'),
     ]
 
-    # --- Gazebo (server + client) ---
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution([gazebo_ros_share, 'launch', 'gazebo.launch.py'])
@@ -56,26 +56,14 @@ def generate_launch_description():
         launch_arguments={'world': world_file}.items()
     )
 
-    # --- Robot state publisher (single source of TF from URDF) ---
     rsp = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
         name='robot_state_publisher',
         output='screen',
-        parameters=[{'use_sim_time': use_sim_time,
-                     'robot_description': robot_description}],
+        parameters=[{'use_sim_time': use_sim_time, 'robot_description': robot_description}],
     )
 
-    # --- Static TF: base_footprint -> base_link (z = wheel radius = 0.032) ---
-    basefoot_tf = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='base_link_to_base_footprint',
-        output='screen',
-        arguments=['0', '0', '0.032', '0', '0', '0', 'base_footprint', 'base_link'],
-    )
-
-    # --- Spawn robot into Gazebo from /robot_description ---
     spawn = Node(
         package='gazebo_ros',
         executable='spawn_entity.py',
@@ -84,7 +72,6 @@ def generate_launch_description():
         arguments=['-entity', 'smartcar', '-topic', 'robot_description'],
     )
 
-    # --- Wheel odometry node (your script) ---
     wheel_odom = Node(
         package='smart_car',
         executable='wheel_odom.py',
@@ -100,7 +87,6 @@ def generate_launch_description():
         remappings=[('/smart_car/vehicle_status', '/smartcar/vehicle_status')],
     )
 
-    # --- Joint state publisher (your script that reads vehicle_status) ---
     jsp = Node(
         package='smart_car',
         executable='joint_state_publisher.py',
@@ -113,7 +99,6 @@ def generate_launch_description():
         }],
     )
 
-    # --- Nav2 stack (your exact nodes & params) ---
     map_server = Node(
         package='nav2_map_server',
         executable='map_server',
@@ -152,7 +137,9 @@ def generate_launch_description():
         executable='bt_navigator',
         name='bt_navigator',
         output='screen',
-        parameters=[{'use_sim_time': use_sim_time}, params_file],
+        parameters=[{'use_sim_time': use_sim_time,
+                     'default_bt_xml_filename': bt_tree},
+                    params_file],
     )
 
     waypoint_follower = Node(
@@ -191,7 +178,6 @@ def generate_launch_description():
         }],
     )
 
-    # --- Robot Localization (EKF) ---
     ekf = Node(
         package='robot_localization',
         executable='ekf_node',
@@ -200,7 +186,6 @@ def generate_launch_description():
         parameters=[PathJoinSubstitution([pkg_share, 'config', 'ekf_localization.yaml'])],
     )
 
-    # --- RViz (load your config + sim time) ---
     rviz = Node(
         package='rviz2',
         executable='rviz2',
@@ -210,28 +195,19 @@ def generate_launch_description():
         parameters=[{'use_sim_time': True}],
     )
 
-    # --- Helpful logs ---
     logs = [
         LogInfo(msg=['[setup] params: ', params_file]),
         LogInfo(msg=['[setup] map: ',    map_yaml]),
         LogInfo(msg=['[setup] rviz: ',   rviz_config]),
-        LogInfo(msg=['[setup] Using xacro file: ', xacro_file]),
+        LogInfo(msg=['[setup] xacro: ',  xacro_file]),
     ]
 
-    # --- Stagger startup a bit for reliability ---
-    # 0.0s: env + gazebo server&client
-    # 1.0s: RSP + static TF
-    # 2.0s: spawn entity
-    # 2.5s: wheel odom + joint state pub
-    # 3.0s: EKF
-    # 3.5s: Nav2 stack
-    # 5.0s: RViz
     return LaunchDescription(
         [declare_use_sim_time] +
         env_sw_render +
         logs + [
             gazebo,
-            TimerAction(period=1.0, actions=[rsp, basefoot_tf]),
+            TimerAction(period=1.0, actions=[rsp]),
             TimerAction(period=2.0, actions=[spawn]),
             TimerAction(period=2.5, actions=[wheel_odom, jsp]),
             TimerAction(period=3.0, actions=[ekf]),
