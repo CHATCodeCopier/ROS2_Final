@@ -8,3 +8,13 @@ log/
 *.pyo
 *.swp
 *.swo
+build/
+install/
+log/
+.vscode/
+.idea/
+**/__pycache__/
+*.pyc
+*.bag
+*.zip
+*.tar.gz

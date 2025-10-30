@@ -67,16 +67,7 @@ def generate_launch_description():
         ],
     )
 
-    # ---- NEW: make sure base_footprint exists in TF ----
-    # If your base_link's origin is at wheel center, set z = wheel_radius (0.032).
-    basefoot_tf = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='base_link_to_base_footprint',
-        # x  y    z      R  P  Y   parent          child
-        arguments=['0', '0', '0.032', '0', '0', '0', 'base_footprint', 'base_link'],
-        output='screen',
-    )
+ 
 
     return LaunchDescription([
         log_xacro,
