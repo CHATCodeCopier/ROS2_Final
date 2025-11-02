@@ -74,8 +74,8 @@ controller_server:
     goal_checker_plugins: ["general_goal_checker"]
     general_goal_checker:
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.25
-      yaw_goal_tolerance: 0.25
+      xy_goal_tolerance: 0.4
+      yaw_goal_tolerance: 0.5
       stateful: true
     current_goal_checker: "general_goal_checker"
 
