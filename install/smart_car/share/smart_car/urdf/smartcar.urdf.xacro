@@ -58,15 +58,16 @@
   </xacro:macro>
 
   <!-- ========================= Base Links ======================= -->
+  <!-- CHANGED: make base_link the parent and base_footprint the child -->
+  <link name="base_link"/>
   <link name="base_footprint"/>
 
-  <joint name="base_footprint_to_base_link" type="fixed">
-    <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
-    <parent link="base_footprint"/>
-    <child  link="base_link"/>
+  <joint name="base_link_to_base_footprint" type="fixed">
+    <!-- was +wheel_radius when base_footprint was parent; now negative -->
+    <origin xyz="0 0 -${wheel_radius}" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child  link="base_footprint"/>
   </joint>
-
-  <link name="base_link"/>
 
   <!-- ========================= Chassis ========================== -->
   <link name="chassis_link">
@@ -313,4 +314,3 @@
   </gazebo>
 
 </robot>
-

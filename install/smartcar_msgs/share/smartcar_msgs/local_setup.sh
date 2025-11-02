@@ -2,7 +2,7 @@
 
 # since this file is sourced use either the provided AMENT_CURRENT_PREFIX
 # or fall back to the destination set at configure time
-: ${AMENT_CURRENT_PREFIX:="/home/ros2/ROS2/install/smartcar_msgs"}
+: ${AMENT_CURRENT_PREFIX:="/home/ros2/ROS2_V2/install/smartcar_msgs"}
 if [ ! -d "$AMENT_CURRENT_PREFIX" ]; then
   if [ -z "$COLCON_CURRENT_PREFIX" ]; then
     echo "The compile time prefix path '$AMENT_CURRENT_PREFIX' doesn't " \

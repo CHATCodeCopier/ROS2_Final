@@ -1,1 +1,1 @@
-/home/ros2/ROS2/install/smartcar_msgs:/home/ros2/ROS2/install/ackermann_msgs:/opt/ros/humble
+/home/ros2/ROS2_V2/install/smart_car:/home/ros2/ROS2_V2/install/car_gazebo_plugin:/home/ros2/ROS2_V2/install/smartcar_msgs:/home/ros2/ROS2_V2/install/ackermann_msgs:/opt/ros/humble

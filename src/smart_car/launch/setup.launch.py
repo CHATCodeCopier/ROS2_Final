@@ -57,13 +57,15 @@ def generate_launch_description():
     wheel_odom = Node(
         package='smart_car', executable='wheel_odom.py', name='wheel_odom', output='screen',
         parameters=[{'wheel_radius': 0.032, 'wheelbase': 0.257, 'odom_frame': 'odom',
-                     'base_frame': 'base_footprint', 'use_sim_time': True}],
+                     'base_frame': 'base_link',          # ← was base_footprint
+                     'publish_tf': True,                # ← new: stop TF from wheel_odom
+                     'use_sim_time': use_sim_time}],     # ← follow launch arg
         remappings=[('/smart_car/vehicle_status', '/smartcar/vehicle_status')],
     )
     jsp = Node(
         package='smart_car', executable='joint_state_publisher.py',
         name='smartcar_joint_state_publisher', output='screen',
-        parameters=[{'use_sim_time': True, 'status_topic': '/smartcar/vehicle_status', 'wheel_radius': 0.032}],
+        parameters=[{'use_sim_time': use_sim_time, 'status_topic': '/smartcar/vehicle_status', 'wheel_radius': 0.032}],
     )
 
     # 5) EKF
@@ -114,7 +116,8 @@ def generate_launch_description():
     # 8) RViz
     rviz = Node(
         package='rviz2', executable='rviz2', name='rviz2', output='screen',
-        arguments=['-d', rviz_cfg], parameters=[{'use_sim_time': True}],
+        arguments=['-d', rviz_cfg],
+        parameters=[{'use_sim_time': use_sim_time}],   # ← was hardcoded True
     )
 
     # Strict timeline (adjust seconds for your VM)
@@ -130,4 +133,3 @@ def generate_launch_description():
     ]
 
     return LaunchDescription([declare_use_sim_time, declare_gui, env, *chain])
-

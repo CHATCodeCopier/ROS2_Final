@@ -1,8 +1,8 @@
-# Install script for directory: /home/ros2/ROS2/build/smartcar_msgs/smartcar_msgs__py
+# Install script for directory: /home/ros2/ROS2_V2/build/smartcar_msgs/smartcar_msgs__py
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/ros2/ROS2/install/smartcar_msgs")
+  set(CMAKE_INSTALL_PREFIX "/home/ros2/ROS2_V2/install/smartcar_msgs")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
